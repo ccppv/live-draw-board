@@ -60,4 +60,3 @@ canvas.onmouseup = (e) => {
 socket.on("draw", (data) => drawShape(ctx, data, false));
 socket.on("init", (all) => all.forEach(s => drawShape(ctx, s, false)));
 socket.on("clear", () => ctx.clearRect(0, 0, canvas.width, canvas.height));
-*/
