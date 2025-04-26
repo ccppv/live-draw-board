@@ -1,22 +1,29 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const path = require('path');
-
+const express = require("express");
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
+const path = require("path");
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-io.on('connection', socket => {
-  console.log('a user connected');
-  socket.on('draw', data => {
-    socket.broadcast.emit('draw', data);
+let drawings = [];
+
+io.on("connection", (socket) => {
+  console.log("a user connected");
+  socket.emit("init", drawings);
+
+  socket.on("draw", (data) => {
+    drawings.push(data);
+    socket.broadcast.emit("draw", data);
+  });
+
+  socket.on("clear", () => {
+    drawings = [];
+    io.emit("clear");
   });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+http.listen(PORT, () => {
+  console.log("Server listening on port", PORT);
 });
